@@ -1,11 +1,12 @@
 {
   "name": "cajero-atm-backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "Backend para cajero ATM",
   "main": "src/app.js",
   "scripts": {
-    "start": "tsnd --respawn --clear src/server.ts",
-    "dev": "tsnd --respawn --clear src/server.ts"
+    "start": "node dist/server.js",
+    "dev": "tsnd --respawn --clear src/server.ts",
+    "build": "tsc -p ."
   },
   "author": "irvinreal",
   "license": "ISC",
