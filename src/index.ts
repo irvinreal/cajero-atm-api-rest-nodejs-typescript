@@ -4,6 +4,7 @@ import dotenv from 'dotenv'
 import express from 'express'
 import accountRoutes from './routes/accountRoutes'
 import authRoutes from './routes/authRoutes'
+import DBConnection from './DBConnection'
 
 dotenv.config()
 
@@ -30,3 +31,5 @@ app.use('/auth', authRoutes)
 app.use('/auth/my-account', accountRoutes)
 
 export default app
+
+DBConnection()
