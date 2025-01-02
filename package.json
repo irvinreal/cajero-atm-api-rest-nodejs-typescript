@@ -2,7 +2,7 @@
   "name": "cajero-atm-backend",
   "version": "1.0.0",
   "description": "Backend para cajero ATM",
-  "main": "src/app.js",
+  "main": "src/server.js",
   "scripts": {
     "start": "node dist/server.js",
     "dev": "tsnd --respawn --clear src/server.ts",
