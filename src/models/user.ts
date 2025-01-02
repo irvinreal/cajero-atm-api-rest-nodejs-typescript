@@ -1,7 +1,7 @@
 import { model, Schema, Types } from 'mongoose'
 import { accountSchema } from './account'
 
-interface IUser {
+export interface IUser {
   name: string
   password: string
   accountId: Types.ObjectId | typeof accountSchema
