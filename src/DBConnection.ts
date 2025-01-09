@@ -1,7 +1,7 @@
 import mongoose from 'mongoose'
 import app from './index'
 
-const PORT = process.env.PORT ?? 3000
+const PORT = process.env.PORT ?? 3500
 
 function DBConnection() {
   mongoose

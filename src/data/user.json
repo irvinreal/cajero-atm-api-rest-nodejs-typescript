@@ -1,0 +1,14 @@
+[
+  {
+    "userId": "aa53935f-0209-4ef4-8bfa-0e44ca6b73ea",
+    "name": "camila",
+    "password": "$2b$10$W4ubm6inR5e6o.HHo/NioOQq7ZW1VJXBO0ahxD7lefR8ENnonFsve",
+    "accountId": "11b7fbc6-8217-49b8-a263-7f34b4ce4952"
+  },
+  {
+    "userId": "2361c131-5e02-46b3-aad8-d6a3c5ff9775",
+    "name": "irvin",
+    "password": "$2b$10$EU1OVbSUlgn4p/NMdlE2SObhXFeLdB6gAQ3aONxA8qVkOwF7U8S5S",
+    "accountId": "15538c2d-1907-4cdc-b300-0f90a639e75f"
+  }
+]

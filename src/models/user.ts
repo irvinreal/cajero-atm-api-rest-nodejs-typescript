@@ -10,17 +10,17 @@ export interface IUser {
 const userSchema = new Schema<IUser>({
   name: {
     type: String,
-    required: true,
+    required: true
   },
   password: {
     type: String,
-    required: true,
+    required: true
   },
   accountId: {
     type: Schema.Types.ObjectId,
     required: true,
-    ref: 'Account',
-  },
+    ref: 'Account'
+  }
 })
 
 export default model('User', userSchema)

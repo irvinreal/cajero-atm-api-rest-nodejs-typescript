@@ -4,127 +4,130 @@ import Account from '../models/account'
 import User from '../models/user'
 
 import { CustomRequest } from '../interface'
+import { findAccountById } from '../services/db/findAccountById'
+import { updateAccountById } from '../services/db/updateAccountById'
 
-export const deposit = async (req: CustomRequest, res: Response): Promise<Response> => {
+export const deposit = async (
+  req: CustomRequest,
+  res: Response
+): Promise<Response | undefined> => {
   let { amount } = req.body
-  const { accountId } = req
+  const { accountId, userId } = req
+  if (!accountId || !userId) return
   amount = parseFloat(amount)
 
   if (!amount) return res.status(400).json({ message: 'Ingresar cantidad' })
 
-  const accountDB = await Account.findById(accountId)
-  if (!accountDB)
-    return res.status(404).json({ message: 'No hay una cuenta relacionada con este cliente.' })
+  const account = await findAccountById(accountId)
 
-  const parsedAmount = parseFloat(accountDB.amount.toString())
+  if (!account)
+    return res
+      .status(404)
+      .json({ message: 'No hay una cuenta relacionada con este cliente.' })
 
-  const newAmount = parsedAmount + amount
+  const newAmount = account.amount + amount
 
-  const amountUpdated = await Account.findByIdAndUpdate(
+  const newAccount = await updateAccountById(accountId, {
     accountId,
-    { amount: newAmount },
-    { returnDocument: 'after' },
-  )
-  if (!amountUpdated) return res.status(500).json({ message: 'Error al retirar en la DB.' })
+    userId,
+    amount: newAmount
+  })
 
-  const parsedAmountUpdated = parseFloat(amountUpdated.amount.toString())
-
-  return res.status(200).json({ message: 'Deposito exitoso.', amount: parsedAmountUpdated })
+  return res
+    .status(200)
+    .json({ message: 'Deposito exitoso.', amount: newAccount.amount })
 }
 
-export const withdraw = async (req: CustomRequest, res: Response): Promise<Response> => {
+export const withdraw = async (
+  req: CustomRequest,
+  res: Response
+): Promise<Response | undefined> => {
   let { amount } = req.body
-  const { accountId } = req
+  const { accountId, userId } = req
+  if (!accountId || !userId) return
 
   amount = parseFloat(amount)
 
   if (!amount) return res.status(400).json({ message: 'Ingresar cantidad' })
 
-  const accountDB = await Account.findById(accountId)
-  if (!accountDB)
-    return res.status(404).json({ message: 'No hay una cuenta relacionada con este cliente.' })
-
-  const parsedAmount = parseFloat(accountDB.amount.toString())
+  const account = await findAccountById(accountId)
+  if (!account)
+    return res
+      .status(404)
+      .json({ message: 'No hay una cuenta relacionada con este cliente.' })
 
   // Verificar que el cliente cuente con dinero suficiente para poder realizar el retiro de la cantidad solicitada
-  if (parsedAmount < amount) {
-    return res
-      .status(400)
-      .json({ message: 'No cuenta con saldo suficiente para realizar el retiro.' })
+  if (account.amount < amount) {
+    return res.status(400).json({
+      message: 'No cuenta con saldo suficiente para realizar el retiro.'
+    })
   }
 
   // Actualizar la cantidad restante después del retiro
-  const newAmount = parsedAmount - amount
-  const amountUpdated = await Account.findByIdAndUpdate(
+  const newAmount = account.amount - amount
+  const newAccount = await updateAccountById(accountId, {
     accountId,
-    { amount: newAmount },
-    { returnDocument: 'after' },
-  )
-  if (!amountUpdated) return res.status(500).json({ message: 'Error al retirar en la DB.' })
+    userId,
+    amount: newAmount
+  })
 
-  const parsedAmountUpdated = parseFloat(amountUpdated.amount.toString())
-
-  return res.status(200).json({ message: 'Retiro exitoso.', amount: parsedAmountUpdated })
+  return res
+    .status(200)
+    .json({ message: 'Retiro exitoso.', amount: newAccount })
 }
 
-export const transfer = async (req: CustomRequest, res: Response): Promise<Response> => {
-  let { amount, userToTransfer } = req.body
-  const { accountId } = req
+export const transfer = async (
+  req: CustomRequest,
+  res: Response
+): Promise<Response | undefined> => {
+  let { amount, accountToTransfer } = req.body
+  const { accountId, userId } = req
+  if (!accountId || !userId) return
 
   amount = parseFloat(amount)
 
-  console.log(amount, userToTransfer)
-
   if (!amount) return res.status(400).json({ message: 'Ingresar cantidad.' })
-  if (!userToTransfer) return res.status(400).json({ message: 'Ingrese una cuenta de destino.' })
+  if (!accountToTransfer)
+    return res.status(400).json({ message: 'Ingrese una cuenta de destino.' })
 
-  const accountDBEmisor = await Account.findById(accountId)
-  if (!accountDBEmisor)
-    return res.status(404).json({ message: 'No hay una cuenta relacionada con este cliente.' })
+  //* retirar dinero de la cuenta del cliente que envia
+  const accountEmisor = await findAccountById(accountId)
+  console.log(accountEmisor)
 
-  const parsedAmountEmisor = parseFloat(accountDBEmisor.amount.toString())
 
-  // Verificar que el cliente cuente con dinero suficiente para poder realizar el retiro de la cantidad solicitada
-  if (parsedAmountEmisor < amount) {
-    return res
-      .status(400)
-      .json({ message: 'No cuenta con saldo suficiente para realizar el retiro.' })
+  //* Verificar que el cliente cuente con dinero suficiente para poder realizar el retiro de la cantidad solicitada
+  if (accountEmisor.amount < amount) {
+    return res.status(400).json({
+      message: 'No cuenta con saldo suficiente para realizar el retiro.'
+    })
   }
 
-  // Verificar que el cliente que recibe existe
-  const userDBReceptor = await User.findById(userToTransfer)
-  if (!userDBReceptor)
-    return res.status(404).json({ message: 'No hay una cuenta relacionada con este cliente.' })
-  const accountDBReceptor = await Account.findById(userDBReceptor.accountId.toString())
-  if (!accountDBReceptor)
-    return res.status(404).json({ message: 'No hay una cuenta relacionada con este cliente.' })
-
-  const parsedAmountReceptor = parseFloat(accountDBReceptor.amount.toString())
-
-  // Actualizar la cantidad restante después del retiro en la cuenta del cliente emisor
-  const newAmountEmisor = parsedAmountEmisor - amount
-  const amountUpdatedEmisor = await Account.findByIdAndUpdate(
+  //* Actualizar la cantidad restante después del retiro en la cuenta del cliente emisor
+  const newAmountEmisor = accountEmisor.amount - amount
+  const updatedAccountEmisor = await updateAccountById(accountId, {
     accountId,
-    { amount: newAmountEmisor },
-    { returnDocument: 'after' },
-  )
-  if (!amountUpdatedEmisor) return res.status(500).json({ message: 'Error al retirar en la DB.' })
+    userId,
+    amount: newAmountEmisor
+  })
 
-  const parsedAmountUpdatedEmisor = parseFloat(amountUpdatedEmisor.amount.toString())
+  //* cuenta del cliente que recibe
+  const accountReceptor = await findAccountById(accountToTransfer)
+  console.log(accountReceptor)
 
-  // Actualizar la cantidad restante después del retiro en la cuenta del cliente que recibe
-  const newAmountReceptor = parsedAmountReceptor + amount
-  const amountUpdatedReceptor = await Account.findByIdAndUpdate(
-    userDBReceptor.accountId.toString(),
-    { amount: newAmountReceptor },
-    { returnDocument: 'after' },
-  )
-  if (!amountUpdatedReceptor) return res.status(500).json({ message: 'Error al retirar en la DB.' })
+  //* Actualizar la cantidad restante después del retiro en la cuenta del cliente receptor
+  const newAmountReceptor = accountReceptor.amount + amount
+  console.log(amount, accountToTransfer, newAmountReceptor)
+  const updatedAccountReceptor = await updateAccountById(accountToTransfer, {
+    accountId: accountToTransfer,
+    userId: accountReceptor.userId,
+    amount: newAmountReceptor
+  })
 
-  const parsedAmountUpdatedReceptor = parseFloat(amountUpdatedReceptor.amount.toString())
-
-  console.log('Cuenta emisor: ', parsedAmountEmisor, ' -> ', parsedAmountUpdatedEmisor)
-  console.log('Cuenta receptor: ', parsedAmountReceptor, ' -> ', parsedAmountUpdatedReceptor)
-
-  return res.status(200).json({ message: 'Transferencia exitosa.' })
+  return res
+    .status(200)
+    .json({
+      message: 'Transferencia exitosa.',
+      updatedAccountEmisor,
+      updatedAccountReceptor
+    })
 }

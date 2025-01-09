@@ -1,5 +1,6 @@
 import { Request } from 'express'
 
 export interface CustomRequest extends Request {
-  accountId?: string 
+  userId?: string
+  accountId?: string
 }

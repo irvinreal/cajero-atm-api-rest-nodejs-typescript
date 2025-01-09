@@ -32,7 +32,9 @@ export const auth = (req: CustomRequest, res: Response, next: VoidFunction) => {
     res.status(500).json({ message: 'Error de autenticación.' })
     return next()
   }
+
   req.accountId = decodedToken.accountId
+  req.userId = decodedToken.userId
 
   next()
 }
