@@ -2,11 +2,11 @@
   "name": "cajero-atm-backend",
   "version": "1.0.0",
   "description": "Backend para cajero ATM",
-  "main": "./index.js",
+  "main": "./dist/index.js",
   "scripts": {
     "start": "npm run build && node dist/index.js",
     "dev": "nodemon",
-    "build": "rimraf ./dist && tsc"
+    "build": "tsc"
   },
   "author": "irvinreal",
   "license": "ISC",
