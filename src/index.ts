@@ -4,7 +4,6 @@ import dotenv from 'dotenv'
 import express from 'express'
 import accountRoutes from './routes/accountRoutes'
 import authRoutes from './routes/authRoutes'
-import DBConnection from './DBConnection'
 import buildLogger from './plugins/logger'
 
 const PORT = process.env.PORT ?? 3000
@@ -37,7 +36,7 @@ app.use((req, res, next) => {
   next()
 })
 
-// Routes
+//* Routes
 // Crear cuenta ( Autenticación )
 app.use('/auth', authRoutes)
 // Movimientos ( Depositos, Retiros, Transferencias )
@@ -52,13 +51,7 @@ const newUserCamila = {
   amount: 0
 }
 
-// const newUserFernando = {
-//   name: 'fernando',
-//   password: 'fer12345',
-//   amount: 25000
-// }
 
 app.listen(PORT, () => {
   console.log(`Server running on PORT: ${PORT}`)
-  // createUser(newUserCamila)
 })
