@@ -1,4 +1,4 @@
-import { getUUID } from '../../plugin/get-id.plugin'
+import { getUUID } from '../../plugins/get-id.plugin'
 import { NewUser, UserModel } from '../../types'
 import { readFile, writeFile } from './dataManager'
 

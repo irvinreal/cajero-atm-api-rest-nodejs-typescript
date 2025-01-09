@@ -2,7 +2,7 @@
   "name": "cajero-atm-backend",
   "version": "1.0.0",
   "description": "Backend para cajero ATM",
-  "main": "./index.js",
+  "main": "./dist/index.js",
   "scripts": {
     "start": "node dist/index.js",
     "dev": "nodemon",

@@ -3,9 +3,7 @@
     "node_modules",
     "dist"
   ],
-  "include": [
-    "src"
-  ],
+  "include": ["src/**/*", "src/data/*.json"],
   "compilerOptions": {
     /* Visit https://aka.ms/tsconfig to read more about this file */
     /* Projects */
